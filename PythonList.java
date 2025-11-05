@@ -1,4 +1,4 @@
-package pythonListProject;
+package PythonList_Java;
 
 class Node{
 	Node(Object data){
@@ -10,13 +10,13 @@ class Node{
 }
 
 
-class PythonList {
+public class PythonList {
 	int length = 0;
 	Node head = null;
 	Node last = null;
 	Node dummy = new Node(null);
 	
-	Object get(int index) {
+	public Object get(int index) {
 		//Empty List
 		if(head == null) {
 			return Integer.MIN_VALUE;
@@ -51,7 +51,7 @@ class PythonList {
 		
 	}
 	
-	void append(Object data) {
+	public void append(Object data) {
 		
 		// Create new Node to add into list
 		Node newNode = new Node(data);
@@ -69,7 +69,7 @@ class PythonList {
 		
 	}
 	
-	void remove(Object data) {
+	public void remove(Object data) {
 		// Empty PythonList
 		if(head == null) {
 			System.err.println("NOTHING TO REMOVE");
@@ -105,7 +105,7 @@ class PythonList {
 		}
 	}
 	
-	Object pop(int index) {
+	public Object pop(int index) {
 		//Empty List, Index is way bigger than size, 
 		if(head == null || index>=length || index<-length) {
 			return Integer.MIN_VALUE;
@@ -157,7 +157,7 @@ class PythonList {
 		}
 	}
 	
-	Object pop() {
+	public Object pop() {
 		if(head == null) {
 			System.err.println("IndexError: pop from empty PythonList");
 			return Integer.MIN_VALUE;
@@ -181,7 +181,7 @@ class PythonList {
 		return data_stored;
 	}
 	
-	void extend(PythonList adding_list) {
+	public void extend(PythonList adding_list) {
 		//Deep Copy Append
 		Node lst = adding_list.head;
 		while(lst!=null) {
@@ -201,14 +201,29 @@ class PythonList {
 		
 	}
 	
-	PythonList copy() {
+	public int count(Object data){
+		// RETURNS the number of occurrences of data
+		int count = 0;
+		
+		Node ptr = head;
+		while(ptr!=null) {
+			if(ptr.data.equals(data)) {
+				count++;
+			}
+			ptr = ptr.next;
+		}
+		
+		return count;
+	}
+	
+	public PythonList copy() {
 		// Deep Copy
 		PythonList copy = new PythonList();
 		copy.extend(this);
 		return copy;
 	}
 	
-	void print() {
+	public void print() {
 		Node ptr = head;
 		System.out.print("[");
 		while(ptr!=null) {
@@ -222,11 +237,11 @@ class PythonList {
 		
 	}
 
-	int length() {
+	public int length() {
 		return length;
 	}
 	
-	void clear() {
+	public void clear() {
 		// In-place Clears the list - does not return anything
 		length = 0;
 		head = last = dummy.next = null;
@@ -241,10 +256,7 @@ class PythonList {
 	// * Code is not threadsafe. Any concurrent access will cause corrupted state (race conditions, partial updates, etc.).
 	// * Implement Doubly Linked linked - efficient back-traversal
 	
-	private int count(Object data){
-		// RETURNS the number of occurrences of data
-		return 0;
-	}
+	
 
 	private int index(Object obj) {
 		// Returns the index of the given Object
