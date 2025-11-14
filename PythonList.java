@@ -69,6 +69,53 @@ public class PythonList {
 		
 	}
 	
+	public void insert(int index, Object data) {
+		// Inserts the obj at given index - such that the list would have obj in index after insertion
+		
+		// Update length
+		length++;
+		
+		//Create the new Node with the data
+		Node newNode = new Node(data);
+		
+		// If list is empty, create a new Node
+		if(head == null) {
+			head = dummy.next = last = newNode;
+			newNode.next = null;
+			return;
+		}
+		
+		// --- INDEX OUT OF BOUND: 
+		
+		//If index is >= length, add the data to the last, update last
+		if(index>=length) {
+			last.next = newNode;
+			last = newNode;
+			return;
+		}
+		
+		// If the index is <= length, add the data to the first, update dummy.next, head
+		if(index<=-length || index == 0) {
+			newNode.next = head;
+			dummy.next = head = newNode;
+			return;
+		}
+		
+		// --- INDEX IN BOUND
+		
+		// If index is negative, change it to positive equivalent
+		index = index<0?length+index:index;
+		
+		// Traverse to the index's previous position, and add the new node
+		Node ptr = head;
+		for(int i = 0; i<index-1; i++) {
+			ptr = ptr.next;
+		}
+		newNode.next = ptr.next;
+		ptr.next = newNode;
+		
+	}
+	
 	public void remove(Object data) {
 		// Empty PythonList
 		if(head == null) {
@@ -216,6 +263,22 @@ public class PythonList {
 		return count;
 	}
 	
+	public int index(Object data) {
+		int index = 0;
+		
+		Node ptr = head;
+		while(ptr!=null) {
+			if(ptr.data.equals(data)) {
+				return index;
+			}
+			index++;
+			ptr = ptr.next;
+		}
+		
+		System.err.println("ValueError: list.index(x): x not in list");
+		return Integer.MIN_VALUE;
+	}
+	
 	public PythonList copy() {
 		// Deep Copy
 		PythonList copy = new PythonList();
@@ -236,6 +299,7 @@ public class PythonList {
 		System.out.println("]");
 		
 	}
+	
 
 	public int length() {
 		return length;
@@ -256,16 +320,6 @@ public class PythonList {
 	// * Code is not threadsafe. Any concurrent access will cause corrupted state (race conditions, partial updates, etc.).
 	// * Implement Doubly Linked linked - efficient back-traversal
 	
-	
-
-	private int index(Object obj) {
-		// Returns the index of the given Object
-		return 0;
-	}
-	
-	private void insert(int index, Object obj) {
-		// Inserts the obj at given index - such that the list would have obj in index after insertion
-	}
 
 	private void reverse() {
 		//In-place modification - reverses the list
