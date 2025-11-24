@@ -279,6 +279,59 @@ public class PythonList {
 		return Integer.MIN_VALUE;
 	}
 	
+	public void reverse() {
+		//In-place modification - reverses the list
+		Node ptr = head;
+		Object[] listElements = new Object[length];
+		
+		for(int i = 0; ptr!=null; i++, ptr=ptr.next) {
+			listElements[i] = ptr.data;
+		}
+		
+		// Changing the data in each node - traverse through the existing linkedlist and change the data only
+		// Not creating an entire new linkedList
+		ptr = head;
+		for(int i = length-1; i>=0; i--, ptr=ptr.next) {
+			ptr.data = listElements[i];
+		}
+	}
+	
+	public PythonList reversed() {
+		//  --- WORKING
+		// RETURNS a reversed version of the list
+		
+		// Store values of list in order in array
+		Node ptr = head;
+		Object[] listElements = new Object[length];
+		
+		for(int i = 0; ptr!=null; i++, ptr=ptr.next) {
+			listElements[i] = ptr.data;
+		}
+		
+		// Create the new list with reversed order
+		// Run the loop from the back of the array and enter into newList
+		PythonList newList = new PythonList();
+		
+		for(int i = length-1; i>=0; i--) {
+			Node newNode = new Node(listElements[i]);
+			System.out.println("Entering "+listElements[i]);
+			
+			if(newList.head == null) {
+				newList.head = newList.last = newNode;
+				newList.dummy.next = newList.head;
+			}
+			
+			else {
+				newList.last.next = newNode;
+				newList.last = newNode;
+			}
+			newList.length++;
+			
+		}
+		
+		return newList;
+	}
+	
 	public PythonList copy() {
 		// Deep Copy
 		PythonList copy = new PythonList();
@@ -321,14 +374,6 @@ public class PythonList {
 	// * Implement Doubly Linked linked - efficient back-traversal
 	
 
-	private void reverse() {
-		//In-place modification - reverses the list
-	}
-	
-	private PythonList reversed() {
-		// RETURNS a reversed version of the list
-		return null;
-	}
 	
 	private void sort() {
 		//In-place sorting of list when elements are comparable
