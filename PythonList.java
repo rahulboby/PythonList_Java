@@ -15,7 +15,6 @@ public class PythonList {
 	int length = 0;
 	Node head = null;
 	Node last = null;
-	Node dummy = new Node(null);
 	
 	public void append(Object data) {
 		
@@ -24,7 +23,6 @@ public class PythonList {
 		
 		if(head == null) {
 			head = last = newNode;
-			dummy.next = head;
 		}
 		else {
 			last.next = newNode;
@@ -49,16 +47,19 @@ public class PythonList {
 		
 		// Negative Index - Backward Traversal
 		if(index<0) {
-			Node fast = head;
-			Node slow = head;
-			for(int i = 0; i<-index; i++) {
-				fast = fast.next;
-			}
-			while(fast!=null) {
-				fast = fast.next;
-				slow = slow.next;
-			}
-			return slow.data;
+			index = length+index;
+			
+//			-- WITHOUT using Length:
+//			Node fast = head;
+//			Node slow = head;
+//			for(int i = 0; i<-index; i++) {
+//				fast = fast.next;
+//			}
+//			while(fast!=null) {
+//				fast = fast.next;
+//				slow = slow.next;
+//			}
+//			return slow.data;
 		}
 		
 		// Positive Index - Normal Traversal
@@ -73,40 +74,45 @@ public class PythonList {
 	public void insert(int index, Object data) {
 		// Inserts the obj at given index - such that the list would have obj in index after insertion
 		
-		// Update length
-		length++;
+		
 		
 		//Create the new Node with the data
 		Node newNode = new Node(data);
 		
 		// If list is empty, create a new Node
 		if(head == null) {
-			head = dummy.next = last = newNode;
+			head = last = newNode;
 			newNode.next = null;
 			return;
 		}
 		
-		// --- INDEX OUT OF BOUND: 
+		// If index is negative, change it to positive equivalent
+		index = index<0?(length)+index:index;
+			
+		// Clip index to 0
+		index = index<0?0:index;
 		
+		// --- INDEX OUT OF BOUND: 
 		//If index is >= length, add the data to the last, update last
+		// length-1 since length was incremented already
 		if(index>=length) {
 			last.next = newNode;
 			last = newNode;
+			// Update length
+			length++;
 			return;
 		}
 		
 		// If the index is <= length, add the data to the first, update dummy.next, head
-		if(index<=-length || index == 0) {
+		if(index == 0) {
 			newNode.next = head;
-			dummy.next = head = newNode;
+			head = newNode;
+			// Update length
+			length++;
 			return;
 		}
 		
 		// --- INDEX IN BOUND
-		
-		// If index is negative, change it to positive equivalent
-		index = index<0?length+index:index;
-		
 		// Traverse to the index's previous position, and add the new node
 		Node ptr = head;
 		for(int i = 0; i<index-1; i++) {
@@ -114,6 +120,8 @@ public class PythonList {
 		}
 		newNode.next = ptr.next;
 		ptr.next = newNode;
+		// Update length
+		length++;
 		
 	}
 	
@@ -124,26 +132,29 @@ public class PythonList {
 			return;
 		}
 		
-		length--;
 		if(head.data.equals(data)) {
+			length--;
 			if(head == last) {
-				head = dummy.next = last = null;
+				head = last = null;
 				
 				return;
 			}
-			dummy.next = head.next;
-			head = dummy.next;
+			head = head.next;
 			return;
 		}
 		
-		Node ptr = dummy;
-		while(!ptr.next.data.equals(data)) {
+		// Find the node with data - if not, throw error and return
+		Node ptr = head;
+		while(ptr.next!=null && !ptr.next.data.equals(data)) {
 			ptr = ptr.next;
-			if(ptr.next == null) {
-				System.err.println("ValueError: PythonList.remove(x): x not in list");
-				return;
-			}
+			
+		} 
+		if(ptr.next == null) {
+			System.err.println("ValueError: PythonList.remove(x): x not in list");
+			return;
 		}
+		length--;
+		// Delete the node if found
 		if(ptr.next == last) {
 			last = ptr;
 			last.next = null;
@@ -159,50 +170,34 @@ public class PythonList {
 			return Integer.MIN_VALUE;
 		}
 		
-		if(index == 0 || index == -length) {
+		if(index<0) {
+			index = length+index;
+		}
+		if(index == 0) {
 			Object return_data = head.data;
 			if(head == last) {
 				head = last = null;
 			}
 			else {
 				head = head.next;
-				dummy.next = head;
 			}
 			length--;
 			return return_data;
 		}
-		// Negative Index - Backward Traversal
+		
+		// Positive Index - Normal Traversal
+		Node ptr = head;
+		for(int i = 1; i<index; i++) {
+			ptr = ptr.next;
+		}
+		if(ptr.next == last) {
+			last = ptr;
+		}
+		Object return_data = ptr.next.data;
+		ptr.next = ptr.next.next;
 		length--;
-		if(index<0) {
-			Node fast = head;
-			Node slow = dummy;
-			for(int i = 0; i<-index; i++) {
-				fast = fast.next;
-			}
-			while(fast!=null) {
-				fast = fast.next;
-				slow = slow.next;
-			}
-			if(slow.next == last) {
-				last = slow;
-			}
-			Object return_data = slow.next.data;
-			slow.next = slow.next.next;
-			return return_data;
-		}
-		else {
-			// Positive Index - Normal Traversal
-			Node ptr = dummy;
-			for(int i = 0; i<index; i++) {
-				ptr = ptr.next;
-			}
-			if(ptr.next == last) {
-				last = ptr;
-			}
-			Object return_data = ptr.next.data;
-			ptr.next = ptr.next.next;
-			return return_data;
-		}
+		return return_data;
+		
 	}
 	
 	public Object pop() {
@@ -215,7 +210,7 @@ public class PythonList {
 		// If only one element in PythonList
 		if(head.next == null) {
 			Object data_stored = head.data;
-			head = null; last = null; dummy.next = null;
+			head = null; last = null;
 			return data_stored;
 		}
 		
@@ -237,7 +232,6 @@ public class PythonList {
 			Node newNode = new Node(lst.data);
 			if(head == null) {
 				head = last = newNode;
-				dummy.next = head;
 			}
 			else {
 				last.next = newNode;
@@ -453,12 +447,14 @@ public class PythonList {
 			while(i>=0) {
 				Node newNode = new Node(arr[i--]);
 				if(newList.head == null) {
-					newList.dummy.next = newList.head = newList.last = newNode;
+					newList.head = newList.last = newNode;
 				}
 				else {
 					newList.last.next = newNode;
 					newList.last = newNode;
 				}
+				// Update length
+				newList.length++;
 			}
 		}
 		
@@ -467,14 +463,18 @@ public class PythonList {
 			
 			while(i<length) {
 				Node newNode = new Node(arr[i++]);
+				newList.length++;
 				if(newList.head == null) {
-					newList.dummy.next = newList.head = newList.last = newNode;
+					newList.head = newList.last = newNode;
 				}
 				else {
 					newList.last.next = newNode;
 					newList.last = newNode;
 				}
+				// Update length
+				newList.length++;
 			}
+			
 		}
 		
 		//PROBLEM: All the values are converted to double
@@ -511,6 +511,8 @@ public class PythonList {
 				arr[j-1] = arr[j];
 				arr[j] = temp;
 				j--;
+				// Update length
+				newList.length++;
 			}
 		}
 		
@@ -522,7 +524,7 @@ public class PythonList {
 		while(i<length) {
 			Node newNode = new Node(arr[i++]);
 			if(newList.head == null) {
-				newList.dummy.next = newList.head = newList.last = newNode;
+				newList.head = newList.last = newNode;
 			}
 			else {
 				newList.last.next = newNode;
@@ -556,7 +558,6 @@ public class PythonList {
 			
 			if(newList.head == null) {
 				newList.head = newList.last = newNode;
-				newList.dummy.next = newList.head;
 			}
 			
 			else {
@@ -675,7 +676,7 @@ public class PythonList {
 	public void clear() {
 		// In-place Clears the list - does not return anything
 		length = 0;
-		head = last = dummy.next = null;
+		head = last = null;
 	}
 	
 	protected boolean isNumericType(Object obj) {
@@ -698,6 +699,7 @@ public class PythonList {
 	// * Code is not threadsafe. Any concurrent access will cause corrupted state (race conditions, partial updates, etc.).
 	// * Implement Doubly Linked linked - efficient back-traversal
 	// * [DONE] SORTING with incomparable datatypes
+	// * in, sort, sorted, changes all values to double: Instead, Store actual objects in the array and use a Comparator: "Arrays.sort(arr, (a, b) -> ((Comparable) a).compareTo(b));"
 	
 	
 	private void append(PythonList adding_list) {
